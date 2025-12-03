@@ -53,16 +53,34 @@ pipeline {
             }
         }
 
-        stage('컨테이너 업로드') {
-            steps {
-                // DockerHub로 이미지 업로드
-                script{
-                    docker login -u $DOCKER_USER -p $DOCKER_PASS
-                    echo "Login successful. Pushing image..."
-                    sh "docker push ${DOCKERHUB_USERNAME}/api-tester:${APP_VERSION}"
-                }
-            }
-        }
+		stage('컨테이너 업로드') {
+		    steps {
+		        // 등록된 Credentials ID ('docker_password')를 사용하여 환경 변수에 주입
+		        // Username은 DOCKER_USER에, Password는 DOCKER_PASS에 할당됩니다.
+		        withCredentials([
+		            usernamePassword(
+		                credentialsId: 'docker_password', // 등록된 Credential ID로 변경해주세요.
+		                usernameVariable: 'DOCKER_USER',
+		                passwordVariable: 'DOCKER_PASS'
+		            )
+		        ]) {
+		            script {
+		                // Docker Hub로 이미지 업로드
+		                
+		                // 1. 보안된 환경 변수를 사용하여 docker login 실행
+		                sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
+		                echo "Login successful. Pushing image..."
+		                
+		                // 2. docker push 실행
+		                // 참고: DOCKERHUB_USERNAME이 'paranmul'이라면 $DOCKER_USER를 사용할 수도 있습니다.
+		                sh "docker push ${DOCKERHUB_USERNAME}/api-tester:${APP_VERSION}"
+		                
+		                // 3. (선택적) 보안을 위해 로그아웃
+		                // sh "docker logout"
+		            }
+		        }
+		    }
+		}
 
         stage('쿠버네티스 배포') {
             steps {
