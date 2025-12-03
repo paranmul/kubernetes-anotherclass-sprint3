@@ -57,6 +57,8 @@ pipeline {
             steps {
                 // DockerHub로 이미지 업로드
                 script{
+                    docker login -u $DOCKER_USER -p $DOCKER_PASS
+                    echo "Login successful. Pushing image..."
                     sh "docker push ${DOCKERHUB_USERNAME}/api-tester:${APP_VERSION}"
                 }
             }
