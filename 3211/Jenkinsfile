@@ -53,7 +53,7 @@ pipeline {
             }
         }
 
-		stage('컨테이너 업로드') {
+		stage('컨테이너 업로드-test') {
 		    steps {
 		        // 등록된 Credentials ID ('docker_password')를 사용하여 환경 변수에 주입
 		        // Username은 DOCKER_USER에, Password는 DOCKER_PASS에 할당됩니다.
